@@ -127,44 +127,48 @@ export default function App() {
         };
         reader.readAsArrayBuffer(file);
       }
-      // Resim İşleme (OCR)
+      // Resim İşleme (Gemini AI)
       else if (file.type.startsWith('image/')) {
-        setUploadStatus(t('input.status_loading_ocr'));
-        await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+        setUploadStatus(t('input.status_scanning')); // "Resim taranıyor..."
 
-        setUploadStatus(t('input.status_scanning'));
-        const worker = await window.Tesseract.createWorker('tur'); // Türkçe dil paketi
-        const { data: { text } } = await worker.recognize(file);
-        await worker.terminate();
+        // Resmi Base64'e çevir
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const base64Image = e.target.result;
 
-        const lines = text.split('\n');
-        const targetName = name.trim().toLowerCase();
-        let detectedDays = [];
+          try {
+            // Netlify Function'a istek at
+            const response = await fetch('/.netlify/functions/analyze-image', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ image: base64Image, name: name })
+            });
 
-        // Satır satır gez
-        lines.forEach(line => {
-          if (line.toLowerCase().includes(targetName)) {
-            // İsim bulunan satırdaki sayıları al
-            const numbers = line.match(/\b([1-9]|[12][0-9]|3[01])\b/g);
-            if (numbers) {
-              detectedDays = [...detectedDays, ...numbers.map(Number)];
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || 'API Error');
             }
+
+            const data = await response.json();
+
+            if (data.shifts && Array.isArray(data.shifts)) {
+              const newShifts = data.shifts.map(day => ({ day, type: 'night' }));
+              setShifts(newShifts);
+              setUploadStatus(t('input.status_complete'));
+              setTimeout(() => { setIsUploading(false); setStep(2); }, 500);
+            } else {
+              throw new Error('Invalid response format');
+            }
+
+          } catch (error) {
+            console.error("OCR Error:", error);
+            // Fallback: Eğer Netlify Function çalışmazsa (lokalde env yoksa vb.) uyarı ver
+            alert(`${t('input.status_error')}\n(Not: Bu özellik için Netlify üzerinde GEMINI_API_KEY tanımlı olmalıdır.)`);
+            setUploadStatus(t('input.status_error'));
+            setTimeout(() => setIsUploading(false), 2000);
           }
-        });
-
-        // Eğer isim satırında gün bulamazsa, belki isim bir üst satırdadır, alt satırlara bak (Basit heuristic)
-        if (detectedDays.length === 0) {
-          // Fallback: Tüm metindeki sayıları al (Kullanıcıya uyarı verilebilir)
-          // Şimdilik sadece isim eşleşmesi varsa çalışsın, yoksa boş dönsün ki kullanıcı manuel girsin.
-          alert(t('input.error_ocr_failed'));
-        }
-
-        const uniqueDays = [...new Set(detectedDays)].sort((a, b) => a - b);
-        const newShifts = uniqueDays.map(day => ({ day, type: 'night' }));
-
-        setShifts(newShifts);
-        setUploadStatus(t('input.status_complete'));
-        setTimeout(() => { setIsUploading(false); setStep(2); }, 500);
+        };
+        reader.readAsDataURL(file);
       }
     } catch (error) {
       console.error(error);
