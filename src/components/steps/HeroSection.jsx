@@ -6,24 +6,24 @@ const HeroSection = ({ onStart }) => {
     const { t } = useLanguage();
 
     return (
-        <main className="flex-1">
-            <div className="relative overflow-hidden bg-white">
+        <main className="flex-1 bg-white dark:bg-gray-900 transition-colors duration-300">
+            <div className="relative overflow-hidden">
                 <div className="max-w-7xl mx-auto">
-                    <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 pt-20 px-4 sm:px-6 lg:px-8">
+                    <div className="relative z-10 pb-8 bg-white dark:bg-gray-900 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 pt-20 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
                         <main className="mt-10 mx-auto max-w-7xl sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28">
                             <div className="sm:text-center lg:text-left">
-                                <div className="inline-block px-4 py-1.5 mb-4 bg-indigo-50 text-indigo-700 rounded-full text-sm font-bold tracking-wide">
+                                <div className="inline-block px-4 py-1.5 mb-4 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-bold tracking-wide">
                                     {t('hero.badge')}
                                 </div>
-                                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
                                     <span className="block xl:inline">{t('hero.title_part1')}</span>{' '}
-                                    <span className="block text-indigo-600 xl:inline">{t('hero.title_part2')}</span>
+                                    <span className="block text-indigo-600 dark:text-indigo-400 xl:inline">{t('hero.title_part2')}</span>
                                 </h1>
-                                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                                <p className="mt-3 text-base text-gray-500 dark:text-gray-400 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
                                     {t('hero.subtitle')}
                                 </p>
                                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                                    <button onClick={onStart} className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg transition shadow-xl shadow-indigo-200">
+                                    <button onClick={onStart} className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg transition shadow-xl shadow-indigo-200 dark:shadow-none">
                                         {t('hero.cta')}
                                         <ArrowRight className="ml-2 w-5 h-5" />
                                     </button>
@@ -32,12 +32,12 @@ const HeroSection = ({ onStart }) => {
                         </main>
                     </div>
                 </div>
-                <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-indigo-50 flex items-center justify-center mt-8 lg:mt-0">
+                <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-indigo-50 dark:bg-gray-800 flex items-center justify-center mt-8 lg:mt-0 transition-colors duration-300">
                     {/* HERO MOCKUP (SIMULATION) */}
                     <div className="relative w-full h-96 lg:h-full flex items-center justify-center overflow-hidden">
                         {/* Arka plan efektleri */}
-                        <div className="absolute w-[500px] h-[500px] bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-                        <div className="absolute w-[500px] h-[500px] bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000 top-0 right-0"></div>
+                        <div className="absolute w-[500px] h-[500px] bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 animate-blob"></div>
+                        <div className="absolute w-[500px] h-[500px] bg-yellow-300 dark:bg-yellow-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 animate-blob animation-delay-2000 top-0 right-0"></div>
 
                         {/* TELEFON ÇERÇEVESİ */}
                         <div className="relative z-10 transform rotate-[-5deg] hover:rotate-0 transition duration-500">
@@ -94,47 +94,47 @@ const HeroSection = ({ onStart }) => {
             </div>
 
             {/* FEATURES */}
-            <div id="nasil-calisir" className="py-12 bg-gray-50">
+            <div id="nasil-calisir" className="py-12 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
-                        <h2 className="text-base text-indigo-600 font-semibold tracking-wide uppercase">{t('hero.how_it_works')}</h2>
-                        <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                        <h2 className="text-base text-indigo-600 dark:text-indigo-400 font-semibold tracking-wide uppercase">{t('hero.how_it_works')}</h2>
+                        <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
                             {t('hero.how_title')}
                         </p>
                     </div>
 
                     <div className="mt-10">
                         <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
-                            <div className="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div className="relative bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
                                 <dt>
                                     <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
                                         <FileSpreadsheet className="h-6 w-6" />
                                     </div>
-                                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">{t('hero.step1_title')}</p>
+                                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-white">{t('hero.step1_title')}</p>
                                 </dt>
-                                <dd className="mt-2 ml-16 text-base text-gray-500">
+                                <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-400">
                                     {t('hero.step1_desc')}
                                 </dd>
                             </div>
-                            <div className="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div className="relative bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
                                 <dt>
                                     <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
                                         <Calendar className="h-6 w-6" />
                                     </div>
-                                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">{t('hero.step2_title')}</p>
+                                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-white">{t('hero.step2_title')}</p>
                                 </dt>
-                                <dd className="mt-2 ml-16 text-base text-gray-500">
+                                <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-400">
                                     {t('hero.step2_desc')}
                                 </dd>
                             </div>
-                            <div className="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <div className="relative bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
                                 <dt>
                                     <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
                                         <ImageIcon className="h-6 w-6" />
                                     </div>
-                                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">{t('hero.step3_title')}</p>
+                                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900 dark:text-white">{t('hero.step3_title')}</p>
                                 </dt>
-                                <dd className="mt-2 ml-16 text-base text-gray-500">
+                                <dd className="mt-2 ml-16 text-base text-gray-500 dark:text-gray-400">
                                     {t('hero.step3_desc')}
                                 </dd>
                             </div>
