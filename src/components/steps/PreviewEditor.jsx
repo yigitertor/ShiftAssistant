@@ -1,17 +1,21 @@
 import React from 'react';
 import { Check, ImageIcon, Calendar as CalendarIcon, Loader2, Camera } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
-const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpaper, generateICS, previewUrl, canvasRef, setStep, selectedDate, MONTHS }) => {
+const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpaper, generateICS, previewUrl, canvasRef, setStep, selectedDate }) => {
+    const { t, translations } = useLanguage();
+    const MONTHS = translations.months;
+
     return (
         <div className="flex-1 flex flex-col lg:flex-row bg-gray-100 overflow-hidden">
             {/* SOL PANEL: AYARLAR */}
             <div className="w-full lg:w-96 bg-white border-r border-gray-200 z-10 flex flex-col h-full">
                 <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-gray-800">Görünüm</h2>
-                    <button onClick={() => setStep(2)} className="text-sm text-gray-500 hover:text-indigo-600">Düzenle</button>
+                    <h2 className="text-xl font-bold text-gray-800">{t('preview.title')}</h2>
+                    <button onClick={() => setStep(2)} className="text-sm text-gray-500 hover:text-indigo-600">{t('preview.edit')}</button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-6">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Temalar</h3>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">{t('preview.themes_title')}</h3>
                     <div className="grid grid-cols-2 gap-3">
                         {Object.values(THEMES).map((theme) => {
                             const Icon = theme.icon || Check;
@@ -34,10 +38,10 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
                 </div>
                 <div className="p-6 border-t border-gray-100 space-y-3 bg-gray-50">
                     <button onClick={downloadWallpaper} className="w-full py-4 bg-gray-900 text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-black transition shadow-lg">
-                        <ImageIcon size={20} /> İndir
+                        <ImageIcon size={20} /> {t('preview.btn_download')}
                     </button>
                     <button onClick={generateICS} className="w-full py-3 bg-white text-indigo-700 border border-indigo-200 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-50 transition">
-                        <CalendarIcon size={18} /> Takvime Ekle
+                        <CalendarIcon size={18} /> {t('preview.btn_calendar')}
                     </button>
                 </div>
             </div>
@@ -54,7 +58,7 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
                         {/* Sahte Kilit Ekranı UI */}
                         <div className="absolute top-12 left-0 w-full text-center z-10 pointer-events-none mix-blend-difference text-white px-8">
                             <div className="text-5xl md:text-7xl font-light tracking-tighter">09:41</div>
-                            <div className="text-xl font-medium mt-2 opacity-90">12 {MONTHS[selectedDate.getMonth()]} Pazartesi</div>
+                            <div className="text-xl font-medium mt-2 opacity-90">12 {MONTHS[selectedDate.getMonth()]}</div>
                         </div>
                         <div className="absolute bottom-10 left-0 w-full flex justify-between px-12 z-10 pointer-events-none mix-blend-difference text-white">
                             <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center"><div className="w-6 h-6 bg-current rounded-full opacity-50" /></div>

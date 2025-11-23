@@ -7,12 +7,16 @@ import CalendarSelection from './components/steps/CalendarSelection';
 import PreviewEditor from './components/steps/PreviewEditor';
 
 import { THEMES } from './constants/themes';
-import { MONTHS } from './constants/months';
 import { getDaysInMonth, getFirstDayOfMonth } from './utils/dateUtils';
 import { loadScript } from './utils/scriptLoader';
 import { drawDecorativePattern } from './utils/canvasUtils';
+import { useLanguage } from './context/LanguageContext';
 
 export default function App() {
+  const { t, translations } = useLanguage();
+  const MONTHS = translations.months;
+  const DAYS = translations.days_short;
+
   const [step, setStep] = useState(0);
   const [name, setName] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -29,15 +33,15 @@ export default function App() {
     if (!file) return;
 
     setIsUploading(true);
-    setUploadStatus('Dosya analiz ediliyor...');
+    setUploadStatus(t('input.status_analyzing'));
 
     try {
       // Excel İşleme
       if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-        setUploadStatus('Excel kütüphanesi yükleniyor...');
+        setUploadStatus(t('input.status_loading_excel'));
         await loadScript('https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js');
 
-        setUploadStatus('Excel okunuyor...');
+        setUploadStatus(t('input.status_reading_excel'));
         const reader = new FileReader();
         reader.onload = (e) => {
           const data = new Uint8Array(e.target.result);
@@ -60,17 +64,17 @@ export default function App() {
           // Tekrarları temizle ve sırala
           const uniqueShifts = [...new Set(detectedShifts)].sort((a, b) => a - b);
           setShifts(uniqueShifts);
-          setUploadStatus('Tamamlandı!');
+          setUploadStatus(t('input.status_complete'));
           setTimeout(() => { setIsUploading(false); setStep(2); }, 500);
         };
         reader.readAsArrayBuffer(file);
       }
       // Resim İşleme (OCR)
       else if (file.type.startsWith('image/')) {
-        setUploadStatus('OCR motoru başlatılıyor (bu biraz sürebilir)...');
+        setUploadStatus(t('input.status_loading_ocr'));
         await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
 
-        setUploadStatus('Resim taranıyor...');
+        setUploadStatus(t('input.status_scanning'));
         const worker = await window.Tesseract.createWorker('tur');
         const { data: { text } } = await worker.recognize(file);
         await worker.terminate();
@@ -84,12 +88,12 @@ export default function App() {
           setShifts(uniqueShifts.filter(() => Math.random() > 0.5));
         }
 
-        setUploadStatus('Tamamlandı!');
+        setUploadStatus(t('input.status_complete'));
         setTimeout(() => { setIsUploading(false); setStep(2); }, 500);
       }
     } catch (error) {
       console.error(error);
-      setUploadStatus('Hata oluştu. Lütfen manuel devam edin.');
+      setUploadStatus(t('input.status_error'));
       setTimeout(() => setIsUploading(false), 2000);
     }
   };
@@ -167,7 +171,7 @@ export default function App() {
     ctx.globalAlpha = 1.0;
 
     // Gün İsimleri
-    const dayNames = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'];
+    const dayNames = DAYS;
     ctx.font = `bold 35px ${theme.font}`;
     ctx.fillStyle = theme.accent;
     dayNames.forEach((d, i) => {
@@ -228,11 +232,11 @@ export default function App() {
     ctx.font = `40px ${theme.font}`;
     ctx.globalAlpha = 0.7;
     const bottomY = startY + (Math.ceil((firstDayIndex + daysInMonth) / 7) * (boxSize + gap)) + 60;
-    ctx.fillText(`${shifts.length} Nöbet Planlandı`, width / 2, bottomY);
+    ctx.fillText(`${shifts.length} ${t('preview.shift_planned')}`, width / 2, bottomY);
 
     if (theme.decorative) {
       ctx.font = `30px ${theme.font}`;
-      ctx.fillText(theme.emoji + " Kolay Gelsin! " + theme.emoji, width / 2, bottomY + 50);
+      ctx.fillText(theme.emoji + " " + t('preview.good_luck') + " " + theme.emoji, width / 2, bottomY + 50);
     }
 
     setPreviewUrl(canvas.toDataURL());
@@ -242,7 +246,7 @@ export default function App() {
     const canvas = canvasRef.current;
     if (canvas) {
       const link = document.createElement('a');
-      link.download = `nobet_duvar_kagidi_${name.replace(/\s+/g, '_')}.png`;
+      link.download = `${t('preview.generated_filename')}_${name.replace(/\s+/g, '_')}.png`;
       link.href = canvas.toDataURL();
       link.click();
     }
@@ -253,7 +257,7 @@ export default function App() {
       const timer = setTimeout(drawCanvas, 100);
       return () => clearTimeout(timer);
     }
-  }, [step, currentTheme, shifts, name, selectedDate]);
+  }, [step, currentTheme, shifts, name, selectedDate, translations]); // translations eklendi
 
   // --- SAYFA RENDER LOGIC ---
 
@@ -263,6 +267,7 @@ export default function App() {
         <>
           <Header onHome={() => setStep(0)} />
           <HeroSection onStart={() => setStep(1)} />
+          <Footer />
         </>
       )}
 
@@ -286,7 +291,6 @@ export default function App() {
             shifts={shifts}
             setShifts={setShifts}
             setStep={setStep}
-            MONTHS={MONTHS}
           />
         </div>
       )}
@@ -304,7 +308,6 @@ export default function App() {
             canvasRef={canvasRef}
             setStep={setStep}
             selectedDate={selectedDate}
-            MONTHS={MONTHS}
           />
         </div>
       )}

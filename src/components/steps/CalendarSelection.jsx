@@ -1,8 +1,13 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { getDaysInMonth, getFirstDayOfMonth } from '../../utils/dateUtils';
+import { useLanguage } from '../../context/LanguageContext';
 
-const CalendarSelection = ({ selectedDate, setSelectedDate, shifts, setShifts, setStep, MONTHS }) => {
+const CalendarSelection = ({ selectedDate, setSelectedDate, shifts, setShifts, setStep }) => {
+    const { t, translations } = useLanguage();
+    const MONTHS = translations.months;
+    const DAYS = translations.days_short;
+
     const toggleShift = (day) => {
         if (shifts.includes(day)) setShifts(shifts.filter(d => d !== day));
         else setShifts([...shifts, day]);
@@ -14,7 +19,7 @@ const CalendarSelection = ({ selectedDate, setSelectedDate, shifts, setShifts, s
                 {/* Sol Taraf: Takvim Kontrol */}
                 <div className="flex-1 p-3 md:p-6 flex flex-col">
                     <div className="flex justify-between items-center mb-2 md:mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800">Günleri Seç</h2>
+                        <h2 className="text-2xl font-bold text-gray-800">{t('calendar.title')}</h2>
                         <div className="flex gap-2">
                             <button onClick={() => {
                                 const d = new Date(selectedDate); d.setMonth(d.getMonth() - 1); setSelectedDate(d); setShifts([]);
@@ -28,7 +33,7 @@ const CalendarSelection = ({ selectedDate, setSelectedDate, shifts, setShifts, s
 
                     <div className="flex-1 overflow-y-auto">
                         <div className="grid grid-cols-7 gap-2 mb-2 text-center text-xs font-bold text-gray-400">
-                            {['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'].map(d => <div key={d}>{d}</div>)}
+                            {DAYS.map(d => <div key={d}>{d}</div>)}
                         </div>
                         <div className="grid grid-cols-7 gap-1 md:gap-2">
                             {Array(getFirstDayOfMonth(selectedDate.getFullYear(), selectedDate.getMonth())).fill(null).map((_, i) => <div key={`blank-${i}`} />)}
@@ -45,9 +50,9 @@ const CalendarSelection = ({ selectedDate, setSelectedDate, shifts, setShifts, s
                     </div>
 
                     <div className="mt-6 pt-6 border-t border-gray-100 flex justify-between items-center">
-                        <span className="font-bold text-gray-700">{shifts.length} gün seçildi</span>
+                        <span className="font-bold text-gray-700">{shifts.length} {t('calendar.selected_days')}</span>
                         <button onClick={() => setStep(3)} disabled={shifts.length === 0} className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2">
-                            Tasarla <ArrowRight size={18} />
+                            {t('calendar.btn_design')} <ArrowRight size={18} />
                         </button>
                     </div>
                 </div>
