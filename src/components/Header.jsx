@@ -6,7 +6,9 @@ const Header = ({ onHome, darkMode, setDarkMode }) => {
     const { language, setLanguage, t } = useLanguage();
 
     const toggleLanguage = () => {
-        setLanguage(prev => prev === 'tr' ? 'en' : 'tr');
+        if (language === 'tr') setLanguage('en');
+        else if (language === 'en') setLanguage('de');
+        else setLanguage('tr');
     };
 
     return (

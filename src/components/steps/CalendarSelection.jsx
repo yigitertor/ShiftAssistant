@@ -30,7 +30,7 @@ const CalendarSelection = ({ selectedDate, setSelectedDate, shifts, setShifts, s
     };
 
     const clearAllShifts = () => {
-        if (window.confirm('Tüm seçimleri temizlemek istediğinize emin misiniz?')) {
+        if (window.confirm(t('calendar.confirm_clear'))) {
             setShifts([]);
         }
     };
@@ -94,7 +94,7 @@ const CalendarSelection = ({ selectedDate, setSelectedDate, shifts, setShifts, s
                                     onClick={clearAllShifts}
                                     className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium flex items-center gap-1 transition-colors"
                                 >
-                                    <Trash2 size={14} /> Temizle
+                                    <Trash2 size={14} /> {t('calendar.btn_clear')}
                                 </button>
                             )}
                         </div>

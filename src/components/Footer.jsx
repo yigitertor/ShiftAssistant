@@ -21,15 +21,13 @@ const Footer = () => {
                         </p>
                     </div>
 
-                    <div className="flex flex-col items-center md:items-end">
-                        <div className="flex gap-4 mb-2">
-                            <a href="https://github.com/yigitertor" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                                <Github size={20} />
-                            </a>
+                    <div className="flex items-center gap-4">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 font-medium flex items-center gap-2">
+                            {t('footer.developer')} <span className="text-indigo-600 dark:text-indigo-400 font-bold">Yiğit Ertör</span>
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                            {t('footer.developer')}: <span className="text-indigo-600 dark:text-indigo-400 font-bold">Yiğit Ertör</span>
-                        </div>
+                        <a href="https://github.com/yigitertor" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                            <Github size={20} />
+                        </a>
                     </div>
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400 dark:text-gray-500">

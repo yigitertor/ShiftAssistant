@@ -3,7 +3,7 @@ import { ArrowRight, FileSpreadsheet, Calendar, Image as ImageIcon } from 'lucid
 import { useLanguage } from '../../context/LanguageContext';
 
 const HeroSection = ({ onStart }) => {
-    const { t } = useLanguage();
+    const { t, translations } = useLanguage();
 
     return (
         <main className="flex-1 bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -52,19 +52,19 @@ const HeroSection = ({ onStart }) => {
                                     <div className="h-[35%] flex flex-col items-center justify-center text-white/50 space-y-1">
                                         {/* İstenilen Random Saat Görünümü */}
                                         <div className="text-5xl font-light text-white tracking-tight">14:38</div>
-                                        <div className="text-[10px] tracking-widest uppercase opacity-70">12 Oct Tue</div>
+                                        <div className="text-[10px] tracking-widest uppercase opacity-70">12 {translations.months[9].slice(0, 3)} {translations.days_short[1]}</div>
                                     </div>
 
                                     {/* İçerik (Aşağı itilmiş) */}
                                     <div className="flex-1 flex flex-col items-center px-4 relative z-10">
                                         {/* Başlıklar */}
-                                        <div className="text-white text-2xl font-bold mb-1">Oct 2025</div>
+                                        <div className="text-white text-2xl font-bold mb-1">{translations.months[9]} 2025</div>
                                         <div className="text-gray-400 text-sm italic mb-6">Dr. John Doe</div>
 
                                         {/* Takvim Grid Simülasyonu */}
                                         <div className="w-full">
                                             <div className="grid grid-cols-7 gap-1 mb-2 text-center">
-                                                {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(d => <span key={d} className="text-[0.6rem] text-gray-500 font-bold">{d}</span>)}
+                                                {translations.days_short.map(d => <span key={d} className="text-[0.6rem] text-gray-500 font-bold">{d}</span>)}
                                             </div>
                                             <div className="grid grid-cols-7 gap-1.5">
                                                 {/* Rastgele Günler */}

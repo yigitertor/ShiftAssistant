@@ -7,10 +7,10 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
     const MONTHS = translations.months;
 
     const fonts = [
-        { name: 'Modern', value: 'sans-serif' },
-        { name: 'Klasik', value: 'serif' },
-        { name: 'Daktilo', value: 'monospace' },
-        { name: 'El Yazısı', value: "'Brush Script MT', cursive" },
+        { name: t('fonts.modern'), value: 'sans-serif' },
+        { name: t('fonts.classic'), value: 'serif' },
+        { name: t('fonts.typewriter'), value: 'monospace' },
+        { name: t('fonts.handwritten'), value: "'Brush Script MT', cursive" },
     ];
 
     const handleImageUpload = (e) => {
@@ -49,7 +49,7 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
                                             <Icon className="w-5 h-5" style={{ color: theme.accent }} />
                                             {currentTheme === theme.id && <div className="bg-indigo-500 text-white rounded-full p-0.5"><Check size={10} /></div>}
                                         </div>
-                                        <span className="text-xs font-bold truncate w-full" style={{ color: theme.text }}>{theme.name}</span>
+                                        <span className="text-xs font-bold truncate w-full" style={{ color: theme.text }}>{t(`themes.${theme.id}`)}</span>
                                     </button>
                                 )
                             })}
@@ -58,12 +58,12 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
 
                     {/* Özelleştirme */}
                     <div>
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Özelleştir</h3>
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">{t('preview.customize_title')}</h3>
 
                         {/* Font Seçimi */}
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                <Type size={16} /> Yazı Tipi
+                                <Type size={16} /> {t('preview.font_label')}
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 {fonts.map(f => (
@@ -82,7 +82,7 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
                         {/* Arka Plan Yükleme */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                                <ImgIcon size={16} /> Özel Arka Plan
+                                <ImgIcon size={16} /> {t('preview.bg_label')}
                             </label>
                             <div className="relative">
                                 <input
@@ -92,7 +92,7 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                 />
                                 <div className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 text-sm flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                                    Fotoğraf Seç
+                                    {t('preview.select_photo')}
                                 </div>
                             </div>
                         </div>
