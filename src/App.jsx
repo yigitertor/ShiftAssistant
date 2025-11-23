@@ -84,13 +84,36 @@ export default function App() {
           const jsonData = window.XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
           const detectedShifts = [];
-          jsonData.forEach(row => {
-            row.forEach(cell => {
+
+          // İsim ile eşleşen satırı bul
+          const targetName = name.trim().toLowerCase();
+          let targetRow = null;
+
+          // Tüm satırları gez
+          for (let row of jsonData) {
+            // Satırdaki hücreleri kontrol et
+            const rowString = row.join(' ').toLowerCase();
+            if (rowString.includes(targetName)) {
+              targetRow = row;
+              break;
+            }
+          }
+
+          if (targetRow) {
+            targetRow.forEach(cell => {
               if (typeof cell === 'number' && cell > 0 && cell <= 31) {
-                if (Math.random() > 0.7) detectedShifts.push({ day: cell, type: 'night' }); // Varsayılan Gece
+                detectedShifts.push({ day: cell, type: 'night' }); // Varsayılan Gece
+              } else if (typeof cell === 'string') {
+                // Bazen sayılar string olarak gelebilir "1", "2" vb.
+                const num = parseInt(cell);
+                if (!isNaN(num) && num > 0 && num <= 31) {
+                  detectedShifts.push({ day: num, type: 'night' });
+                }
               }
             });
-          });
+          } else {
+            alert(t('input.error_name_not_found'));
+          }
 
           // Tekrarları temizle (Basitçe gün numarasına göre)
           const uniqueShifts = Array.from(new Set(detectedShifts.map(s => s.day)))
@@ -110,19 +133,36 @@ export default function App() {
         await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
 
         setUploadStatus(t('input.status_scanning'));
-        const worker = await window.Tesseract.createWorker('tur');
+        const worker = await window.Tesseract.createWorker('tur'); // Türkçe dil paketi
         const { data: { text } } = await worker.recognize(file);
         await worker.terminate();
 
-        const numbers = text.match(/\b([1-9]|[12][0-9]|3[01])\b/g);
-        if (numbers) {
-          const uniqueDays = [...new Set(numbers.map(Number))].sort((a, b) => a - b);
-          const newShifts = uniqueDays
-            .filter(() => Math.random() > 0.5)
-            .map(day => ({ day, type: 'night' }));
-          setShifts(newShifts);
+        const lines = text.split('\n');
+        const targetName = name.trim().toLowerCase();
+        let detectedDays = [];
+
+        // Satır satır gez
+        lines.forEach(line => {
+          if (line.toLowerCase().includes(targetName)) {
+            // İsim bulunan satırdaki sayıları al
+            const numbers = line.match(/\b([1-9]|[12][0-9]|3[01])\b/g);
+            if (numbers) {
+              detectedDays = [...detectedDays, ...numbers.map(Number)];
+            }
+          }
+        });
+
+        // Eğer isim satırında gün bulamazsa, belki isim bir üst satırdadır, alt satırlara bak (Basit heuristic)
+        if (detectedDays.length === 0) {
+          // Fallback: Tüm metindeki sayıları al (Kullanıcıya uyarı verilebilir)
+          // Şimdilik sadece isim eşleşmesi varsa çalışsın, yoksa boş dönsün ki kullanıcı manuel girsin.
+          alert(t('input.error_ocr_failed'));
         }
 
+        const uniqueDays = [...new Set(detectedDays)].sort((a, b) => a - b);
+        const newShifts = uniqueDays.map(day => ({ day, type: 'night' }));
+
+        setShifts(newShifts);
         setUploadStatus(t('input.status_complete'));
         setTimeout(() => { setIsUploading(false); setStep(2); }, 500);
       }
