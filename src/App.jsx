@@ -135,37 +135,60 @@ export default function App() {
         const reader = new FileReader();
         reader.onload = async (e) => {
           const base64Image = e.target.result;
+          console.log("Starting image analysis...");
 
           try {
+            // 15 saniyelik zaman aşımı (timeout)
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Request timed out (15s)")), 15000)
+            );
+
             // Netlify Function'a istek at
-            const response = await fetch('/.netlify/functions/analyze-image', {
+            const fetchPromise = fetch('/.netlify/functions/analyze-image', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ image: base64Image, name: name })
             });
 
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.error || 'API Error');
+            console.log("Sending request to /.netlify/functions/analyze-image");
+            const response = await Promise.race([fetchPromise, timeoutPromise]);
+            console.log("Response received:", response.status, response.statusText);
+
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+              // JSON dönmediyse (örn: 404 sayfası, 500 hatası vb.)
+              const text = await response.text();
+              console.error("Non-JSON response:", text);
+              throw new Error(`Server error: ${response.status} ${response.statusText}`);
             }
 
             const data = await response.json();
 
+            if (!response.ok) {
+              throw new Error(data.error || data.details || 'API Error');
+            }
+
             if (data.shifts && Array.isArray(data.shifts)) {
+              console.log("Shifts found:", data.shifts);
               const newShifts = data.shifts.map(day => ({ day, type: 'night' }));
               setShifts(newShifts);
               setUploadStatus(t('input.status_complete'));
               setTimeout(() => { setIsUploading(false); setStep(2); }, 500);
             } else {
-              throw new Error('Invalid response format');
+              throw new Error('Invalid response format: shifts array missing');
             }
 
           } catch (error) {
             console.error("OCR Error:", error);
-            // Fallback: Eğer Netlify Function çalışmazsa (lokalde env yoksa vb.) uyarı ver
-            alert(`${t('input.status_error')}\n(Not: Bu özellik için Netlify üzerinde GEMINI_API_KEY tanımlı olmalıdır.)`);
-            setUploadStatus(t('input.status_error'));
-            setTimeout(() => setIsUploading(false), 2000);
+            // Hata mesajını kullanıcıya göster
+            const errorMessage = error.message || "Unknown Error";
+            alert(`${t('input.status_error')}\nDetay: ${errorMessage}`);
+
+            // Ekranda da hatayı göster
+            setUploadStatus(`Hata: ${errorMessage}`);
+
+            // Mesajın okunabilmesi için süreyi uzat (5 saniye)
+            setTimeout(() => setIsUploading(false), 5000);
           }
         };
         reader.readAsDataURL(file);
