@@ -32,7 +32,7 @@ export default async (req, context) => {
 
         // Gemini API Kurulumu
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
 
         // Base64 başlığını temizle (data:image/png;base64,...)
         const base64Data = image.split(",")[1];
