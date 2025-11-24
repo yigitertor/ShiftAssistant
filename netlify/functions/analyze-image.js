@@ -32,7 +32,6 @@ export default async (req, context) => {
 
         // Gemini API Kurulumu
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
 
         // Base64 başlığını temizle (data:image/png;base64,...)
         const base64Data = image.split(",")[1];
@@ -46,7 +45,7 @@ export default async (req, context) => {
       Do not include any markdown formatting or explanation, just the raw JSON array.
     `;
 
-        const result = await model.generateContent([
+        const inputParts = [
             prompt,
             {
                 inlineData: {
@@ -54,7 +53,23 @@ export default async (req, context) => {
                     mimeType: "image/jpeg",
                 },
             },
-        ]);
+        ];
+
+        let result;
+        let usedModel = "gemini-1.5-flash";
+
+        try {
+            console.log(`Attempting with model: ${usedModel}`);
+            const model = genAI.getGenerativeModel({ model: usedModel });
+            result = await model.generateContent(inputParts);
+        } catch (error) {
+            console.warn(`Failed with ${usedModel}:`, error.message);
+            // Fallback: gemini-pro-vision (Eski ama güvenilir model)
+            usedModel = "gemini-pro-vision";
+            console.log(`Fallback to model: ${usedModel}`);
+            const model = genAI.getGenerativeModel({ model: usedModel });
+            result = await model.generateContent(inputParts);
+        }
 
         const responseText = result.response.text();
 
@@ -62,7 +77,7 @@ export default async (req, context) => {
         const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
         const shifts = JSON.parse(cleanedText);
 
-        return new Response(JSON.stringify({ shifts }), {
+        return new Response(JSON.stringify({ shifts, usedModel }), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });

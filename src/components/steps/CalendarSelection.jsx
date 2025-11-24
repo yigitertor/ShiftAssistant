@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Trash2 } from 'lucide-react';
+import { ArrowRight, Trash2, ArrowLeft } from 'lucide-react';
 import { getDaysInMonth, getFirstDayOfMonth } from '../../utils/dateUtils';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -98,9 +98,17 @@ const CalendarSelection = ({ selectedDate, setSelectedDate, shifts, setShifts, s
                                 </button>
                             )}
                         </div>
-                        <button onClick={() => setStep(3)} disabled={shifts.length === 0} className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2">
-                            {t('calendar.btn_design')} <ArrowRight size={18} />
-                        </button>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setStep(1)}
+                                className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                                <ArrowLeft size={20} />
+                            </button>
+                            <button onClick={() => setStep(3)} disabled={shifts.length === 0} className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2">
+                                {t('calendar.btn_design')} <ArrowRight size={18} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

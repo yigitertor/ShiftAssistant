@@ -33,10 +33,10 @@ export default function App() {
   };
 
   const [step, setStep] = useState(() => getInitialState('step', 0));
-  const [name, setName] = useState(() => getInitialState('name', ''));
+  const [name, setName] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date()); // Date objesi JSON'da string olur, o yüzden bunu direkt init ediyoruz
   // Shifts artık obje dizisi: { day: 1, type: 'night' }
-  const [shifts, setShifts] = useState(() => getInitialState('shifts', []));
+  const [shifts, setShifts] = useState([]);
   const [currentTheme, setCurrentTheme] = useState(() => getInitialState('currentTheme', 'minimal'));
 
   // Yeni Özellikler State'leri
@@ -51,8 +51,6 @@ export default function App() {
 
   // --- PERSISTENCE ---
   useEffect(() => { localStorage.setItem('step', JSON.stringify(step)); }, [step]);
-  useEffect(() => { localStorage.setItem('name', JSON.stringify(name)); }, [name]);
-  useEffect(() => { localStorage.setItem('shifts', JSON.stringify(shifts)); }, [shifts]);
   useEffect(() => { localStorage.setItem('currentTheme', JSON.stringify(currentTheme)); }, [currentTheme]);
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
