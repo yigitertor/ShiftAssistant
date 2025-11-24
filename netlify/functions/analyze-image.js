@@ -69,7 +69,19 @@ export default async (req, context) => {
 
     } catch (error) {
         console.error("Gemini API Error:", error);
-        return new Response(JSON.stringify({ error: "Failed to process image", details: error.message }), {
+
+        const errorMessage = error.message || error.toString() || "Unknown Error";
+        const errorDetails = {
+            message: errorMessage,
+            name: error.name,
+            stack: error.stack,
+            fullError: JSON.stringify(error, Object.getOwnPropertyNames(error))
+        };
+
+        return new Response(JSON.stringify({
+            error: errorMessage,
+            details: JSON.stringify(errorDetails)
+        }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
         });

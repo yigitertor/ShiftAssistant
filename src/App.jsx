@@ -129,6 +129,13 @@ export default function App() {
       }
       // Resim İşleme (Gemini AI)
       else if (file.type.startsWith('image/')) {
+        // Boyut kontrolü (Netlify Functions limiti ~6MB, Base64 ile şişeceği için 4MB sınırı koyalım)
+        if (file.size > 4 * 1024 * 1024) {
+          alert(t('input.error_file_too_large') || "Dosya boyutu çok büyük. Lütfen 4MB'dan küçük bir resim yükleyin.");
+          setIsUploading(false);
+          return;
+        }
+
         setUploadStatus(t('input.status_scanning')); // "Resim taranıyor..."
 
         // Resmi Base64'e çevir
@@ -165,7 +172,8 @@ export default function App() {
             const data = await response.json();
 
             if (!response.ok) {
-              throw new Error(data.error || data.details || 'API Error');
+              // Detaylı hata mesajını göster (details varsa onu kullan, yoksa error'u)
+              throw new Error(data.details || data.error || 'API Error');
             }
 
             if (data.shifts && Array.isArray(data.shifts)) {
