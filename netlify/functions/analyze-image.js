@@ -19,8 +19,11 @@ export default async (req, context) => {
         }
 
         // API Key kontrolü
-        const apiKey = Netlify.env.get("GEMINI_API_KEY");
+        // Netlify Functions (Node.js) için standart process.env kullanımı
+        const apiKey = process.env.GEMINI_API_KEY;
+
         if (!apiKey) {
+            console.error("API Key is missing in process.env");
             return new Response(JSON.stringify({ error: "Server configuration error: API Key missing" }), {
                 status: 500,
                 headers: { "Content-Type": "application/json" },
@@ -48,7 +51,7 @@ export default async (req, context) => {
             {
                 inlineData: {
                     data: base64Data,
-                    mimeType: "image/jpeg", // Genellikle jpeg veya png kabul eder, dinamik de yapılabilir ama basitlik için
+                    mimeType: "image/jpeg",
                 },
             },
         ]);
