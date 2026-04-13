@@ -8,9 +8,9 @@ const HeroSection = ({ onStart }) => {
     return (
         <main className="flex-1 bg-white dark:bg-gray-900 transition-colors duration-300">
             <div className="relative overflow-hidden">
-                <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto">
                     <div className="relative z-10 pb-8 bg-white dark:bg-gray-900 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 pt-20 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-                        <main className="mt-10 mx-auto max-w-7xl sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28">
+                        <div className="mt-10 mx-auto max-w-7xl sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28">
                             <div className="sm:text-center lg:text-left">
                                 <div className="inline-block px-4 py-1.5 mb-4 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-bold tracking-wide">
                                     {t('hero.badge')}
@@ -29,7 +29,7 @@ const HeroSection = ({ onStart }) => {
                                     </button>
                                 </div>
                             </div>
-                        </main>
+                        </div>
                     </div>
                 </div>
                 <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 bg-indigo-50 dark:bg-gray-800 flex items-center justify-center mt-8 lg:mt-0 transition-colors duration-300">

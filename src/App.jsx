@@ -85,56 +85,59 @@ export default function App() {
         await loadScript('https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js');
 
         setUploadStatus(t('input.status_reading_excel'));
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const data = new Uint8Array(e.target.result);
-          const workbook = window.XLSX.read(data, { type: 'array' });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonData = window.XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
-          const detectedShifts = [];
+        // reader.onload Promise'e sarıldı — hatalar dışarıdaki catch'e düşsün
+        await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error('Dosya okunamadı.'));
+          reader.onload = (e) => {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const workbook = window.XLSX.read(data, { type: 'array' });
+              const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+              const jsonData = window.XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
-          // İsim ile eşleşen satırı bul
-          const targetName = name.trim().toLowerCase();
-          let targetRow = null;
+              const detectedShifts = [];
+              const targetName = name.trim().toLowerCase();
+              let targetRow = null;
 
-          // Tüm satırları gez
-          for (let row of jsonData) {
-            // Satırdaki hücreleri kontrol et
-            const rowString = row.join(' ').toLowerCase();
-            if (rowString.includes(targetName)) {
-              targetRow = row;
-              break;
-            }
-          }
-
-          if (targetRow) {
-            targetRow.forEach(cell => {
-              if (typeof cell === 'number' && cell > 0 && cell <= 31) {
-                detectedShifts.push({ day: cell, type: 'night' }); // Varsayılan Gece
-              } else if (typeof cell === 'string') {
-                // Bazen sayılar string olarak gelebilir "1", "2" vb.
-                const num = parseInt(cell);
-                if (!isNaN(num) && num > 0 && num <= 31) {
-                  detectedShifts.push({ day: num, type: 'night' });
+              for (let row of jsonData) {
+                const rowString = row.join(' ').toLowerCase();
+                if (rowString.includes(targetName)) {
+                  targetRow = row;
+                  break;
                 }
               }
-            });
-          } else {
-            alert(t('input.error_name_not_found'));
-          }
 
-          // Tekrarları temizle (Basitçe gün numarasına göre)
-          const uniqueShifts = Array.from(new Set(detectedShifts.map(s => s.day)))
-            .map(day => {
-              return detectedShifts.find(s => s.day === day);
-            }).sort((a, b) => a.day - b.day);
+              if (targetRow) {
+                targetRow.forEach(cell => {
+                  if (typeof cell === 'number' && cell > 0 && cell <= 31) {
+                    detectedShifts.push({ day: cell, type: 'night' });
+                  } else if (typeof cell === 'string') {
+                    const num = parseInt(cell);
+                    if (!isNaN(num) && num > 0 && num <= 31) {
+                      detectedShifts.push({ day: num, type: 'night' });
+                    }
+                  }
+                });
+              } else {
+                alert(t('input.error_name_not_found'));
+              }
 
-          setShifts(uniqueShifts);
-          setUploadStatus(t('input.status_complete'));
-          setTimeout(() => { setIsUploading(false); setStep(2); }, 500);
-        };
-        reader.readAsArrayBuffer(file);
+              const uniqueShifts = Array.from(new Set(detectedShifts.map(s => s.day)))
+                .map(day => detectedShifts.find(s => s.day === day))
+                .sort((a, b) => a.day - b.day);
+
+              setShifts(uniqueShifts);
+              setUploadStatus(t('input.status_complete'));
+              setTimeout(() => { setIsUploading(false); setStep(2); }, 500);
+              resolve();
+            } catch (parseError) {
+              reject(parseError);
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        });
       }
       // Resim İşleme (Gemini AI)
       else if (file.type.startsWith('image/')) {
@@ -402,14 +405,17 @@ export default function App() {
       )}
 
       {step === 1 && (
-        <InputForm
-          name={name}
-          setName={setName}
-          setStep={setStep}
-          handleFileUpload={handleFileUpload}
-          isUploading={isUploading}
-          uploadStatus={uploadStatus}
-        />
+        <div className="flex-1 flex flex-col min-h-screen">
+          <Header onHome={() => setStep(0)} darkMode={darkMode} setDarkMode={setDarkMode} />
+          <InputForm
+            name={name}
+            setName={setName}
+            setStep={setStep}
+            handleFileUpload={handleFileUpload}
+            isUploading={isUploading}
+            uploadStatus={uploadStatus}
+          />
+        </div>
       )}
 
       {step === 2 && (

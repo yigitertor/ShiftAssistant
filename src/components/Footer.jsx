@@ -31,7 +31,7 @@ const Footer = () => {
                     </div>
                 </div>
                 <div className="border-t border-gray-200 dark:border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400 dark:text-gray-500">
-                    &copy; 2024 {t('meta.title')}. {t('footer.rights')}
+                    &copy; {new Date().getFullYear()} {t('meta.title')}. {t('footer.rights')}
                 </div>
             </div>
         </footer>
