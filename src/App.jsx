@@ -32,11 +32,20 @@ export default function App() {
     return defaultValue;
   };
 
-  const [step, setStep] = useState(() => getInitialState('step', 0));
-  const [name, setName] = useState('');
+  // step + name + shifts birlikte tutarlı şekilde restore edilmeli
+  // Eğer step>=2 ama gerekli state yoksa step 0'a al
+  const [name, setName] = useState(() => getInitialState('name', ''));
+  const [shifts, setShifts] = useState(() => getInitialState('shifts', []));
+  const [step, setStep] = useState(() => {
+    const savedStep = getInitialState('step', 0);
+    const savedName = getInitialState('name', '');
+    const savedShifts = getInitialState('shifts', []);
+    // Step 2 için isim gerekli, step 3 için isim + nöbet gerekli
+    if (savedStep >= 3 && (!savedName || savedShifts.length === 0)) return 0;
+    if (savedStep >= 2 && !savedName) return 0;
+    return savedStep;
+  });
   const [selectedDate, setSelectedDate] = useState(new Date()); // Date objesi JSON'da string olur, o yüzden bunu direkt init ediyoruz
-  // Shifts artık obje dizisi: { day: 1, type: 'night' }
-  const [shifts, setShifts] = useState([]);
   const [currentTheme, setCurrentTheme] = useState(() => getInitialState('currentTheme', 'minimal'));
 
   // Yeni Özellikler State'leri
@@ -51,6 +60,8 @@ export default function App() {
 
   // --- PERSISTENCE ---
   useEffect(() => { localStorage.setItem('step', JSON.stringify(step)); }, [step]);
+  useEffect(() => { localStorage.setItem('name', JSON.stringify(name)); }, [name]);
+  useEffect(() => { localStorage.setItem('shifts', JSON.stringify(shifts)); }, [shifts]);
   useEffect(() => { localStorage.setItem('currentTheme', JSON.stringify(currentTheme)); }, [currentTheme]);
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
@@ -149,10 +160,12 @@ export default function App() {
             );
 
             // Netlify Function'a istek at
+            // Gerçek MIME type'ı base64 data URL'den çıkar
+            const mimeType = base64Image.split(';')[0].split(':')[1] || 'image/jpeg';
             const fetchPromise = fetch('/.netlify/functions/analyze-image', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ image: base64Image, name: name })
+              body: JSON.stringify({ image: base64Image, name: name, mimeType })
             });
 
             console.log("Sending request to /.netlify/functions/analyze-image");

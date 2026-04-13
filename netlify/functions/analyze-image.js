@@ -9,7 +9,7 @@ export default async (req, context) => {
     try {
         // Request body'sini al
         const body = await req.json();
-        const { image, name } = body;
+        const { image, name, mimeType } = body;
 
         if (!image || !name) {
             return new Response(JSON.stringify({ error: "Image and name are required" }), {
@@ -19,7 +19,6 @@ export default async (req, context) => {
         }
 
         // API Key kontrolü
-        // Netlify Functions (Node.js) için standart process.env kullanımı
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
@@ -36,6 +35,9 @@ export default async (req, context) => {
         // Base64 başlığını temizle (data:image/png;base64,...)
         const base64Data = image.split(",")[1];
 
+        // MIME type — client'tan gelen değeri kullan, yoksa jpeg varsayılan
+        const imageMimeType = mimeType || "image/jpeg";
+
         const prompt = `
       Analyze this image of a shift schedule.
       Find the shifts for the person named "${name}".
@@ -50,22 +52,22 @@ export default async (req, context) => {
             {
                 inlineData: {
                     data: base64Data,
-                    mimeType: "image/jpeg",
+                    mimeType: imageMimeType,
                 },
             },
         ];
 
         let result;
-        let usedModel = "gemini-1.5-flash";
+        let usedModel = "gemini-2.0-flash";
 
         try {
-            console.log(`Attempting with model: ${usedModel}`);
+            console.log(`Attempting with model: ${usedModel}, mimeType: ${imageMimeType}`);
             const model = genAI.getGenerativeModel({ model: usedModel });
             result = await model.generateContent(inputParts);
         } catch (error) {
             console.warn(`Failed with ${usedModel}:`, error.message);
-            // Fallback: gemini-pro-vision (Eski ama güvenilir model)
-            usedModel = "gemini-pro-vision";
+            // Fallback: gemini-1.5-pro (stabil, multimodal destekli)
+            usedModel = "gemini-1.5-pro";
             console.log(`Fallback to model: ${usedModel}`);
             const model = genAI.getGenerativeModel({ model: usedModel });
             result = await model.generateContent(inputParts);
