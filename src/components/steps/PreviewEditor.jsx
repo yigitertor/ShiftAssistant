@@ -1,10 +1,13 @@
-import React from 'react';
-import { Check, ImageIcon, Calendar as CalendarIcon, Loader2, Camera, Type, Image as ImgIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, ImageIcon, Calendar as CalendarIcon, Loader2, Camera, Type, Image as ImgIcon, Share2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import ShiftStats from '../ShiftStats';
+import ShiftNotification from '../ShiftNotification';
 
-const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpaper, generateICS, previewUrl, canvasRef, setStep, selectedDate, customFont, setCustomFont, setCustomBgImage }) => {
+const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpaper, generateICS, previewUrl, canvasRef, setStep, selectedDate, customFont, setCustomFont, setCustomBgImage, shifts, SHIFT_TYPES, name }) => {
     const { t, translations } = useLanguage();
     const MONTHS = translations.months;
+    const [shareStatus, setShareStatus] = useState('');
 
     const fonts = [
         { name: t('fonts.modern'), value: 'sans-serif' },
@@ -22,6 +25,40 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
         }
     };
 
+    // F2: URL tabanlı paylaşım
+    const handleShare = async () => {
+        try {
+            const shareData = {
+                n: name,
+                m: selectedDate.getMonth(),
+                y: selectedDate.getFullYear(),
+                s: shifts.map(s => `${s.day}:${s.type[0]}`).join(',')
+                // Format: "1:n,5:d,12:f" (compact)
+            };
+            const params = new URLSearchParams(shareData);
+            const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+
+            if (navigator.share) {
+                await navigator.share({
+                    title: t('meta.title'),
+                    text: `${name} - ${MONTHS[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`,
+                    url: shareUrl,
+                });
+            } else {
+                await navigator.clipboard.writeText(shareUrl);
+                setShareStatus('copied');
+                setTimeout(() => setShareStatus(''), 2000);
+            }
+        } catch (e) {
+            // User cancelled share or clipboard failed
+            if (e.name !== 'AbortError') {
+                console.error('Share error:', e);
+                setShareStatus('error');
+                setTimeout(() => setShareStatus(''), 2000);
+            }
+        }
+    };
+
     return (
         <div className="flex-1 flex flex-col lg:flex-row bg-gray-100 dark:bg-gray-900 overflow-hidden transition-colors duration-300">
             {/* SOL PANEL: AYARLAR */}
@@ -30,7 +67,10 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
                     <h2 className="text-xl font-bold text-gray-800 dark:text-white">{t('preview.title')}</h2>
                     <button onClick={() => setStep(2)} className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600">{t('preview.edit')}</button>
                 </div>
-                <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+
+                    {/* İstatistikler (F3) */}
+                    <ShiftStats shifts={shifts} SHIFT_TYPES={SHIFT_TYPES} />
 
                     {/* Temalar */}
                     <div>
@@ -98,14 +138,30 @@ const PreviewEditor = ({ currentTheme, setCurrentTheme, THEMES, downloadWallpape
                         </div>
                     </div>
 
+                    {/* Bildirimler (F4) */}
+                    <ShiftNotification shifts={shifts} selectedDate={selectedDate} name={name} />
+
                 </div>
                 <div className="p-6 border-t border-gray-100 dark:border-gray-700 space-y-3 bg-gray-50 dark:bg-gray-800">
                     <button onClick={downloadWallpaper} className="w-full py-4 bg-gray-900 dark:bg-black text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-black transition shadow-lg">
                         <ImageIcon size={20} /> {t('preview.btn_download')}
                     </button>
-                    <button onClick={generateICS} className="w-full py-3 bg-white dark:bg-gray-700 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-gray-600 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-50 dark:hover:bg-gray-600 transition">
-                        <CalendarIcon size={18} /> {t('preview.btn_calendar')}
-                    </button>
+                    <div className="flex gap-2">
+                        <button onClick={generateICS} className="flex-1 py-3 bg-white dark:bg-gray-700 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-gray-600 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-50 dark:hover:bg-gray-600 transition">
+                            <CalendarIcon size={18} /> {t('preview.btn_calendar')}
+                        </button>
+                        <button
+                            onClick={handleShare}
+                            className="flex-none px-4 py-3 bg-white dark:bg-gray-700 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-gray-600 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-50 dark:hover:bg-gray-600 transition relative"
+                        >
+                            <Share2 size={18} />
+                            {shareStatus === 'copied' && (
+                                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-1 rounded-lg whitespace-nowrap">
+                                    {t('preview.share_copied')}
+                                </span>
+                            )}
+                        </button>
+                    </div>
                 </div>
             </div>
 

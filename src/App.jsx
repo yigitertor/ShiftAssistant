@@ -58,6 +58,36 @@ export default function App() {
   const [previewUrl, setPreviewUrl] = useState('');
   const canvasRef = useRef(null);
 
+  // --- F2: URL PAYLAŞIM — URL'den state'i restore et ---
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const sharedName = params.get('n');
+    const sharedMonth = params.get('m');
+    const sharedYear = params.get('y');
+    const sharedShifts = params.get('s');
+
+    if (sharedName && sharedShifts) {
+      setName(sharedName);
+
+      if (sharedMonth !== null && sharedYear !== null) {
+        setSelectedDate(new Date(parseInt(sharedYear), parseInt(sharedMonth), 1));
+      }
+
+      // Format: "1:n,5:d,12:f" -> [{day:1, type:'night'}, ...]
+      const typeMap = { d: 'day', n: 'night', f: 'full' };
+      const parsed = sharedShifts.split(',').map(entry => {
+        const [day, typeChar] = entry.split(':');
+        return { day: parseInt(day), type: typeMap[typeChar] || 'night' };
+      }).filter(s => !isNaN(s.day));
+
+      setShifts(parsed);
+      setStep(3);
+
+      // URL'yi temizle (paylaşım parametrelerini kaldır)
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   // --- PERSISTENCE ---
   useEffect(() => { localStorage.setItem('step', JSON.stringify(step)); }, [step]);
   useEffect(() => { localStorage.setItem('name', JSON.stringify(name)); }, [name]);
@@ -192,7 +222,11 @@ export default function App() {
 
             if (data.shifts && Array.isArray(data.shifts)) {
               console.log("Shifts found:", data.shifts);
-              const newShifts = data.shifts.map(day => ({ day, type: 'night' }));
+              // Server artık {day, type} obje dizisi dönüyor
+              const newShifts = data.shifts.map(s => {
+                if (typeof s === 'number') return { day: s, type: 'night' }; // backward compat
+                return { day: s.day, type: s.type || 'night' };
+              });
               setShifts(newShifts);
               setUploadStatus(t('input.status_complete'));
               setTimeout(() => { setIsUploading(false); setStep(2); }, 500);
@@ -448,6 +482,9 @@ export default function App() {
             customFont={customFont}
             setCustomFont={setCustomFont}
             setCustomBgImage={setCustomBgImage}
+            shifts={shifts}
+            SHIFT_TYPES={SHIFT_TYPES}
+            name={name}
           />
         </div>
       )}

@@ -58,7 +58,31 @@ export const translations = {
             btn_calendar: "Takvime Ekle",
             generated_filename: "nobet_duvar_kagidi",
             shift_planned: "Nöbet Planlandı",
-            good_luck: "Kolay Gelsin!"
+            good_luck: "Kolay Gelsin!",
+            btn_share: "Paylaş",
+            share_copied: "Link kopyalandı!",
+            share_error: "Paylaşım linki oluşturulamadı."
+        },
+        stats: {
+            title: "İSTATİSTİKLER",
+            day_shifts: "Gündüz Nöbeti",
+            night_shifts: "Gece Nöbeti",
+            full_shifts: "24 Saat Nöbet",
+            total_hours: "Toplam Saat",
+            hours: "saat",
+            total_shifts: "toplam nöbet"
+        },
+        notifications: {
+            title: "BİLDİRİMLER",
+            enable: "Bildirimleri Etkinleştir",
+            reminder: "Nöbet Hatırlatma",
+            time_label: "Hatırlatma Saati (1 gün önce)",
+            schedule_btn: "Hatırlatmaları Kaydet",
+            scheduled: "Kaydedildi!",
+            not_supported: "Tarayıcınız bildirimleri desteklemiyor.",
+            reminder_title: "Yarın Nöbetiniz Var!",
+            reminder_body: "Nöbet günü:",
+            note: "Bildirimler tarayıcı açıkken çalışır. Sayfa kapatılırsa hatırlatma iptal olur."
         },
         themes: {
             minimal: "Minimal Siyah",
@@ -144,7 +168,31 @@ export const translations = {
             btn_calendar: "Add to Calendar",
             generated_filename: "shift_wallpaper",
             shift_planned: "Shifts Planned",
-            good_luck: "Good Luck!"
+            good_luck: "Good Luck!",
+            btn_share: "Share",
+            share_copied: "Link copied!",
+            share_error: "Could not create share link."
+        },
+        stats: {
+            title: "STATISTICS",
+            day_shifts: "Day Shifts",
+            night_shifts: "Night Shifts",
+            full_shifts: "24-Hour Shifts",
+            total_hours: "Total Hours",
+            hours: "hrs",
+            total_shifts: "total shifts"
+        },
+        notifications: {
+            title: "NOTIFICATIONS",
+            enable: "Enable Notifications",
+            reminder: "Shift Reminder",
+            time_label: "Reminder Time (1 day before)",
+            schedule_btn: "Save Reminders",
+            scheduled: "Saved!",
+            not_supported: "Your browser does not support notifications.",
+            reminder_title: "You Have a Shift Tomorrow!",
+            reminder_body: "Shift day:",
+            note: "Notifications work when the browser is open. Closing the page cancels reminders."
         },
         themes: {
             minimal: "Minimal Black",
@@ -230,7 +278,31 @@ export const translations = {
             btn_calendar: "Zum Kalender hinzufügen",
             generated_filename: "schicht_hintergrundbild",
             shift_planned: "Schichten geplant",
-            good_luck: "Viel Glück!"
+            good_luck: "Viel Glück!",
+            btn_share: "Teilen",
+            share_copied: "Link kopiert!",
+            share_error: "Freigabelink konnte nicht erstellt werden."
+        },
+        stats: {
+            title: "STATISTIKEN",
+            day_shifts: "Tagschichten",
+            night_shifts: "Nachtschichten",
+            full_shifts: "24-Stunden-Schichten",
+            total_hours: "Gesamtstunden",
+            hours: "Std",
+            total_shifts: "Schichten gesamt"
+        },
+        notifications: {
+            title: "BENACHRICHTIGUNGEN",
+            enable: "Benachrichtigungen aktivieren",
+            reminder: "Schichterinnerung",
+            time_label: "Erinnerungszeit (1 Tag vorher)",
+            schedule_btn: "Erinnerungen speichern",
+            scheduled: "Gespeichert!",
+            not_supported: "Ihr Browser unterstützt keine Benachrichtigungen.",
+            reminder_title: "Morgen haben Sie eine Schicht!",
+            reminder_body: "Schichttag:",
+            note: "Benachrichtigungen funktionieren nur bei geöffnetem Browser."
         },
         themes: {
             minimal: "Minimal Schwarz",

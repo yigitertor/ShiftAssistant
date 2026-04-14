@@ -41,8 +41,15 @@ export default async (req, context) => {
         const prompt = `
       Analyze this image of a shift schedule.
       Find the shifts for the person named "${name}".
-      Return ONLY a JSON array of numbers representing the days of the month where this person has a shift.
-      Example response: [1, 5, 12, 20]
+
+      Try to detect the SHIFT TYPE for each day:
+      - "day" = daytime shift (gündüz, 08:00-16:00, or similar)
+      - "night" = night shift (gece, 16:00-08:00, or similar)
+      - "full" = 24-hour shift (24 saat, nöbet, or similar)
+
+      Return ONLY a JSON array of objects with "day" (number) and "type" (string) fields.
+      Example response: [{"day": 1, "type": "night"}, {"day": 5, "type": "day"}, {"day": 12, "type": "full"}]
+      If you cannot determine the shift type, default to "night".
       If no shifts are found for this name, return [].
       Do not include any markdown formatting or explanation, just the raw JSON array.
     `;
@@ -66,7 +73,6 @@ export default async (req, context) => {
             result = await model.generateContent(inputParts);
         } catch (error) {
             console.warn(`Failed with ${usedModel}:`, error.message);
-            // Fallback: gemini-1.5-pro (stabil, multimodal destekli)
             usedModel = "gemini-1.5-pro";
             console.log(`Fallback to model: ${usedModel}`);
             const model = genAI.getGenerativeModel({ model: usedModel });
@@ -77,7 +83,25 @@ export default async (req, context) => {
 
         // JSON temizleme (Markdown blocklarını kaldır)
         const cleanedText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
-        const shifts = JSON.parse(cleanedText);
+        const parsed = JSON.parse(cleanedText);
+
+        // Backward compat: eski format [1,5,12] → yeni format [{day:1,type:"night"},...]
+        let shifts;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            if (typeof parsed[0] === 'number') {
+                // Eski format — sadece sayı dizisi
+                shifts = parsed.map(day => ({ day, type: "night" }));
+            } else {
+                // Yeni format — obje dizisi, type'ı doğrula
+                const validTypes = ["day", "night", "full"];
+                shifts = parsed.map(s => ({
+                    day: s.day,
+                    type: validTypes.includes(s.type) ? s.type : "night"
+                }));
+            }
+        } else {
+            shifts = [];
+        }
 
         return new Response(JSON.stringify({ shifts, usedModel }), {
             status: 200,
